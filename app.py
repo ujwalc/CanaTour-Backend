@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request
 import connection
 import boto
+from datetime import datetime
 
 
 app = Flask(__name__)
@@ -40,7 +41,7 @@ def check_source_city():
 
 	return render_template('index.html')
 
-@app.route("/destination")
+@app.route("/destination",methods=['GET'])
 def destination_search():
 	if 'id' in request.args:
 		id=request.args['id']
@@ -72,8 +73,42 @@ def book_ticket():
 def get_report():
 	return render_template('index.html')
 
-@app.route("/bus/schedule")
+@app.route("/bus/schedule",methods=['GET']) # For this Function, we already assume that the username is stored in 'usersession' table, and the user source city is directly picked from there.
 def get_schedule():
+	schd = connection.connection_manager()
+	schd.execute("SELECT username FROM usersession")
+	session_dets = schd.fetchall()
+
+	for val in session_dets:
+		username = val[0]
+		print ("Username: "+username)
+
+	if 'dest' in request.args:
+		destination=request.args['dest']
+		
+		schd.execute("SELECT s.sourcecity, s.destid, d.destname, d.destloc, d.destprov, s.journeydate, s.starttime, s.seatsavailable FROM schedule s, usersession us, cities_lookup cl, destination d WHERE us.usersourcecity = cl.cityid AND cl.cityname=s.sourcecity AND d.destid=s.destid AND s.destid = %s AND us.username= %s",[destination,username])
+		results = schd.fetchall()
+
+		for res in results:
+			srccity = res[0]
+			destid = res[1]
+			destname = res[2]
+			destloc = res[3]
+			destprov = res[4]
+			journeydate = res[5]
+			starttime = res[6]
+			seatsav = res[7]
+
+			jourdate=journeydate.strftime("%m-%d-%Y")
+
+			print("Source City: "+srccity)
+			print("Destination Name: "+destname)
+			print("Destination Location: "+destloc+', '+destprov)
+			print("Date of journey: "+jourdate)
+			print("Bus start time: "+starttime)
+			print("Seats Available: "+str(seatsav))
+	else:
+		print("Error")
 	return render_template('index.html')
 
 @app.route("/sendfiletos3")
