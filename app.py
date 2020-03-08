@@ -7,6 +7,7 @@ app = Flask(__name__)
 
 @app.route("/")
 def hello():
+	print("Hello")
 	return render_template('index.html')
 
 @app.route("/check")
@@ -31,7 +32,9 @@ def check_source_city():
 		results = abc.fetchall()
 		for res in results:
 			cityname = res[1]
+			print(cityname)
 			cityid = res[0]
+			print(cityid)
 	else:
 		print("Error")
 
@@ -39,6 +42,26 @@ def check_source_city():
 
 @app.route("/destination")
 def destination_search():
+	if 'id' in request.args:
+		id=request.args['id']
+		dest_srch = connection.connection_manager()
+		dest_srch.execute("select destid, destname, destdesc, destloc, destprov from destination where desttype= %s",[id])
+		results = dest_srch.fetchall()
+		for res in results:
+			destid = res[0]
+			destname = res[1]
+			destdesc = res[2]
+			destloc = res[3]+', '+res[4]
+			destprov = res[4]
+
+			print(destid)
+			print(destname)
+			print(destdesc)
+			print(destloc)
+			print(destprov)
+			print('\n')
+	else:
+		print("Error")
 	return render_template('index.html')
 
 @app.route("/book/ticket")
