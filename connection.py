@@ -5,7 +5,7 @@ def connection_manager():
 	    database="postgres",
 	    user="postgres",
 	    password="postgres",
-	    host="projectdb.cimrgapnfn9w.us-east-2.rds.amazonaws.com",
+	    host="cloud-database.c4tjyvon2isw.us-east-1.rds.amazonaws.com",
 	    port='5432'
 	)
 	cursor=connection.cursor()

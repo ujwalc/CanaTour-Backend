@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+    <title>Page Title</title>
+</head>
+
+<body>
+    <!-- This section handles navigation bar on the top of the page -->
+    <nav class="navbar navbar-expand-sm bg-dark navbar-dark">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="#"> Home </a>
+            </li>
+        </ul>
+        <ul class="navbar-nav mx-auto">
+            <li class="nav-item">
+                <form class="form-inline" action="/action_page.php">
+                    <input class="form-control mr-sm-2" type="text" placeholder="Search">
+                    <button class="btn btn-success" type="submit">Search</button>
+                </form>
+            </li>
+        </ul>
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('login')}}"> Login </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{{url_for('signup')}}"> Sign up </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="jumbotron">
+        <h2> <b> Welcome to CanaTour </b> </h2>
+        <p> CanaTour is an web application that allows you to perform search of tourist destinations, and 
+            book a ticket to provincial/national parks, major beaches, and important cities.
+        </p>
+    </div>      
+
+    <div class="container">   
+        <ul class="nav nav-tabs nav-justified">
+            <li class="nav-item">
+                <a href="{{url_for('getallcities',type='PARK')}}">
+                <figure>
+                    <img src="{{url_for('static', filename='national-park.jpg')}}" width="300" height="200"/> 
+                    <figcaption> <b> National Parks </b> </figcaption>
+                </figure>
+                </a>   
+            </li>
+            <li class="nav-item">
+                <a href="{{url_for('getallcities',type='BEACH')}}">
+                <figure>
+                    <img src="{{url_for('static', filename='beach.jpg')}}" width="300" height="200"/> 
+                    <figcaption> <b> Beaches </b> </figcaption>
+                </figure>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{url_for('getallcities',type='CITY')}}">
+                <figure>
+                    <img src="{{url_for('static', filename='city.jpg')}}" width="300" height="200"/>
+                    <figcaption> <b> Cities </b> </figcaption>
+                </figure>
+                </a>
+            </li>
+        </ul>      
+          
+        <div class="tab-content">
+            <div id="park">
+                <form action="{{ url_for('get_schedule') }}" method="post">
+                    <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item" style="border: none">
+                            <div class="dropdown">
+                                  <select id="source" name="source">
+                                      {% for j in source_list %}
+                                <option value="{{j['cityid']}}">{{j['cityname']}}</option>
+                                      {% endfor %}
+                              </select>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <div class="dropdown">
+                                <select id="destination" name="destination">
+                                    {% for i in destination_list %}
+                                <option value="{{i['destid']}}">{{i['destname']}}</option>
+                                    {% endfor %}
+                              </select>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <label for="datepicker"> Departure Date: </label>
+                            <input type="date" id="datepicker" name="datepicker">
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <label for="quantity"> No of passengers: </label>
+                            <input type="number" id="passengers" name="passengers" min="1" max="20">
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <button type="submit" class="btn btn-success"> Search </button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+            <div id="beach" class="tab-pane fade">
+                <form action="/">
+                    <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item" style="border: none">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"> Source Location
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                <li> abc </li>
+                                <li> def </li>
+                                <li> ghi </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"> Destination Location
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                <li> stu </li>
+                                <li> vwx </li>
+                                <li> yzz </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <label for="datepicker"> Departure Date: </label>
+                            <input type="date" id="datepicker" name="datepicker">
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <label for="quantity"> No of passengers: </label>
+                            <input type="number" id="quantity" name="quantity" min="1" max="20">
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <button type="submit" class="btn btn-success"> Book </button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+            <div id="city" class="tab-pane fade">
+                <form action="/">
+                    <ul class="list-group list-group-horizontal">
+                        <li class="list-group-item" style="border: none">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"> Source Location
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                <li> abc </li>
+                                <li> def </li>
+                                <li> ghi </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"> Destination Location
+                                    <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                <li> stu </li>
+                                <li> vwx </li>
+                                <li> yzz </li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <label for="datepicker"> Departure Date: </label>
+                            <input type="date" id="datepicker" name="datepicker">
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <label for="quantity"> No of passengers: </label>
+                            <input type="number" id="quantity" name="quantity" min="1" max="20">
+                        </li>
+                        <li class="list-group-item" style="border: none">
+                            <button type="submit" class="btn btn-success"> Book </button>
+                        </li>
+                    </ul>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</body>
