@@ -1,0 +1,24 @@
+{
+  "name": "webtravel-apis",
+  "version": "1.0.0",
+  "description": "",
+  "main": "userauth.js",
+  "dependencies": {
+    "all": "0.0.0",
+    "amazon-cognito-identity-js": "^3.2.5",
+    "aws-sdk": "^2.643.0",
+    "express": "^4.17.1",
+    "jsonwebtoken": "^8.5.1",
+    "jwk-to-pem": "^2.0.3",
+    "module": "^1.2.5",
+    "node-fetch": "^2.6.0",
+    "request": "^2.88.2",
+    "sleep": "^6.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
