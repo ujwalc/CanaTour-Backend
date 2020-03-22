@@ -66,6 +66,9 @@ def check_source_city():
 @app.route("/getallcities",methods=['GET'])
 def getallcities():
     destination_type=request.args['type']
+    device = 'web'
+    if 'device' in request.args:
+        device = request.args['device']
     connection = psycopg2.connect(
         database="postgres",
         user="postgres",
@@ -93,7 +96,10 @@ def getallcities():
         destination_dict['destid'] =  res[0]
         destination_list.append(destination_dict)
     print(destination_list)
-    return render_template('home.html',source_list=source_cities,destination_list = destination_list)
+    if device != 'mobile':
+        return render_template('home.html',source_list=source_cities,destination_list = destination_list)
+    else:
+        return json.dumps({"source_list": source_cities,"destination_list":destination_list})
 
 
 @app.route("/destinations", methods=['GET'])
