@@ -222,11 +222,14 @@ def put_file_to_s3():
         print(b.key)
     return render_template('index.html')
 
-@app.route("/bus/search",methods=['POST'])
+@app.route("/bus/search",methods=['GET','POST'])
 def get_schedule():
     schd = connection.connection_manager()
     #schd.execute("SELECT username FROM usersession")
     #session_dets = schd.fetchall()
+    device = 'web'
+    if 'device' in request.args:
+        device = request.args['device']
     sourcecityid = request.form['source']
     destination_id = request.form['destination']
     number_of_args = request.form['passengers']
@@ -274,7 +277,10 @@ def get_schedule():
 
     else:
         print("Error")
-    return render_template('buses.html',bus_list=bus_list)
+    if device != 'mobile':
+        return render_template('buses.html',bus_list=bus_list)
+    else:
+        return json.dumps({"bus_list": bus_list})
 
 #def get_secret_hash(username):
 #    msg = username + CLIENT_ID
