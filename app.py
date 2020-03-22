@@ -125,6 +125,10 @@ def destination_search():
 
 @app.route("/book/ticket",methods=['POST','GET'])
 def book_ticket():
+    device = 'web'
+    if 'device' in request.args:
+        device = request.args['device']
+    print(device)
     connection = psycopg2.connect(
         database="postgres",
         user="postgres",
@@ -140,9 +144,18 @@ def book_ticket():
     expityMonth = request.form['expiryMonth']
     expityYear = request.form['expiryYear']
     cvCode = request.form['cvCode']
+    print(cvCode)
     number_of_travellers = 10
-    scheduleid = session['scheduleid']
-    passengers = session['passengers']
+    if session.get('scheduleid'):
+        scheduleid = session['scheduleid']
+    else:
+        if 'scheduleid' in request.args:
+            scheduleid = request.args['scheduleid']
+    if session.get('passengers'):
+        passengers = session['passengers']
+    else:
+        if 'passengers' in request.args:
+            passengers = request.args['passengers']
     username = 'vidip2'
     bus_dict = {}
     active_status = True
@@ -174,14 +187,17 @@ def book_ticket():
         try:
             schd.execute(
                 "INSERT INTO tickets (ticketid,username,destid,seatsbooked,active_status,scheduleid,payment) VALUES ('',%s,%s,%s,%s,%s,%s);",
-                [destination_id,username,destination_id,number_of_travellers,active_status,scheduleid,price])
+                [destination_id,username,destination_id,number_of_travellers,active_status,scheduleid,bus_dict['price']])
             connection.commit()
         except Exception as e:
             print(e)
         print(bus_dict)
     else:
         print("into else")
-    return render_template('ticket.html',bus_dict=bus_dict)
+    if device != 'mobile':
+        return render_template('ticket.html',bus_dict=bus_dict)
+    else:
+        return bus_dict
 
 @app.route("/payment")
 def payment():
