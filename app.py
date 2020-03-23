@@ -35,13 +35,23 @@ def database_connection():
 def login():
 	return render_template('login.html')
 
-@app.route("/signin",methods=['POST'])
+@app.route("/signin",methods=['POST','GET'])
 def signin():
+    device = 'web'
+    if 'device'  in request.args:
+        device = request.args['device']
     email = request.form['email']
     password = request.form['password']
     response = requests.get("http://127.0.0.1:3000/login/"+email+"/"+password)
     print(response)
-    return render_template('home.html')
+    result = response.json()
+    print(result)
+    session['toke_id'] = result
+    if result != '':
+        if device != 'mobile':
+            return render_template('home.html',user=email)
+        else:
+            return json.dumps({"token_id":result,"username":email})
 
 @app.route("/signup")
 def signup():
@@ -125,6 +135,8 @@ def destination_search():
 
 @app.route("/book/ticket",methods=['POST','GET'])
 def book_ticket():
+    if session.get('token_id'):
+        token_id = session['token_id']
     device = 'web'
     if 'device' in request.args:
         device = request.args['device']

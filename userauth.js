@@ -1,15 +1,19 @@
 var express = require("express");
 var app = express();
 var bodyParser = require('body-parser')
+global.token_main = ""
 
 app.use(bodyParser.json())
 app.listen(3000, () => {
  console.log("Server running on port 3000");
 });
 app.get("/login/:email/:password", (req, res) => {
-var token_id = Login(req.params.email,req.params.password);
-console.log("my token"+token_id)
-res.json(token_id);
+var token_id = Login(req.params.email,req.params.password,logToken);
+function logToken(token_id) {
+        console.log("my token " + token_id)
+        res.json(token_id);
+    }
+
 });
 
 
@@ -63,7 +67,7 @@ function RegisterUser(){
 RegisterUser();
 }
 
-function Login(email,password) {
+function Login(email,password,callback) {
 const AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 const CognitoUserPool = AmazonCognitoIdentity.CognitoUserPool;
 const AWS = require('aws-sdk');
@@ -91,12 +95,13 @@ const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
     var cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
     cognitoUser.authenticateUser(authenticationDetails, {
         onSuccess:function (result) {
-            console.log('access token + ' + result.getAccessToken().getJwtToken());
-            console.log('id token + ' + result.getIdToken().getJwtToken());
+          //  console.log('access token + ' + result.getAccessToken().getJwtToken());
+           // console.log('id token + ' + result.getIdToken().getJwtToken());
           //  console.log('refresh token + ' + result.getRefreshToken().getToken());
             var access_token = result.getAccessToken().getJwtToken()
             var token_id= result.getIdToken().getJwtToken()
-            return token_id;
+            token_main = token_id
+            callback(token_id);
         },
         onFailure: function(err) {
             console.log(err);
