@@ -261,7 +261,7 @@ def get_schedule():
             bus_dict['source_city_name'] = source_city_name
             bus_dict['destination_name'] = destination_name
             bus_dict['destprov'] = destprov
-            bus_dict['journeydate'] = journeydate
+            bus_dict['journeydate'] = str(journeydate)
             bus_dict['starttime'] = starttime
             bus_dict['seatsavailable'] = seatsavailable
             bus_dict['busid'] = busid
@@ -280,7 +280,7 @@ def get_schedule():
     if device != 'mobile':
         return render_template('buses.html',bus_list=bus_list)
     else:
-        return json.dumps({"bus_list": bus_list})
+        return json.dumps({"buslists": bus_list})
 
 #def get_secret_hash(username):
 #    msg = username + CLIENT_ID

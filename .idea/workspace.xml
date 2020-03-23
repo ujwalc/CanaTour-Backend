@@ -15,8 +15,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="211">
-              <caret line="229" column="17" selection-start-line="229" selection-start-column="17" selection-end-line="229" selection-end-column="17" />
+            <state relative-caret-position="278">
+              <caret line="263" column="54" selection-start-line="263" selection-start-column="54" selection-end-line="263" selection-end-column="54" />
               <folding>
                 <element signature="e#0#58#0" expanded="true" />
               </folding>
@@ -115,7 +115,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="34" />
+    <option name="x" value="-79" />
     <option name="y" value="23" />
     <option name="width" value="1440" />
     <option name="height" value="801" />
@@ -185,7 +185,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="34" y="23" width="1440" height="801" extended-state="0" />
+    <frame x="-79" y="23" width="1440" height="801" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.24947146" />
@@ -258,8 +258,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="229" column="17" selection-start-line="229" selection-start-column="17" selection-end-line="229" selection-end-column="17" />
+        <state relative-caret-position="278">
+          <caret line="263" column="54" selection-start-line="263" selection-start-column="54" selection-end-line="263" selection-end-column="54" />
           <folding>
             <element signature="e#0#58#0" expanded="true" />
           </folding>
