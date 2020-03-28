@@ -256,6 +256,19 @@ def get_report():
 	#datetime.today().strftime('%Y-%m-%d')
 	dep_date = request.form.get('depdate') # Fetching the date from the admin
 	
+    """
+    We can implement this other logic here, but I'm somehow unable to do it because of some indent error.
+    I tried to debug it a lot but it just doesn't go. So, if you can, implement this below logic.
+
+    This logic defaults the dep_date to current date and shows the buses and travellers of the current date when we load the report page
+    and when the admin changes the date, it'll show the info related to that particular date. This is logically the correct way to do it.
+
+    if dep_date==None:
+        dep_date = datetime.today().strftime('%Y-%m-%d')
+    
+    busesdet_query = ....
+
+    """
 	if dep_date != None:
 
 		# Queries to fetch bus related data and travelers data
