@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block head %}
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+{% endblock %}
+{% block body %}
+
+    <style type="text/css">
+        body { margin-top:20px; }
+.panel-title {display: inline;font-weight: bold;}
+.checkbox.pull-right { margin: 0; }
+.pl-ziro { padding-left: 0px; }
+    </style>
+
+
+   <div class="container">
+          <h2 style="text-align:center">Ticket Confirmation</h2>
+       <div class="card mb-3">
+  <img class="card-img-top" src="{{url_for('static', filename='long_beach.jpg')}}" alt="Card image cap" height="250">
+  <div class="card-body">
+    <h5 class="card-title">Thank You for Booking ticket with Us. Have agreat journey.</h5>
+      <p class="card-text">Ticket Booked By: {{bus_dict['username']}}</p>
+    <p class="card-text">From: {{bus_dict['source_city_id']}}</p>
+      <p class="card-text">To: {{bus_dict['destination_id']}}</p>
+      <p class="card-text">Price: {{bus_dict['price']}}</p>
+       <p class="card-text">Bus Details: {{bus_dict['busid']}}</p>
+      <p class="card-text">Bus Departure Date: {{bus_dict['journeydate']}}</p>
+      <p class="card-text">Bus Departure Time: {{bus_dict['starttime']}}</p>
+       <p class="card-text">Seats Booked: {{bus_dict['passengers']}}</p>
+    <p class="card-text"><small class="text-muted">Ticket Booked</small></p>
+  </div>
+</div>
+    </div>
+
+{% endblock %}
