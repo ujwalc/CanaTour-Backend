@@ -72,8 +72,8 @@ def book_ticket():
                 print("Bus id: " + str(busid))
             try:
                 schd.execute(
-                        "INSERT INTO tickets (ticketid,username,destid,seatsbooked,active_status,scheduleid,payment) VALUES ('',%s,%s,%s,%s,%s,%s);",
-                        [destination_id,username,destination_id,number_of_travellers,active_status,scheduleid,bus_dict['price']])
+                        "INSERT INTO tickets (username,destid,seatsbooked,active_status,payment,scheduleid) VALUES (%s,%s,%s,%s,%s,%s);",
+                        [username,destination_id,number_of_travellers,active_status,bus_dict['price'],scheduleid])
                 connection.commit()
             except Exception as e:
                 print(e)
