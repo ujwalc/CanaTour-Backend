@@ -9,6 +9,7 @@ import hashlib
 import base64
 import json
 import psycopg2
+from datetime import date
 
 
 app = Flask(__name__)
@@ -126,21 +127,6 @@ def confirm_signup():
         else:
             return False
 
-@app.route("/source/city",methods=['GET'])
-def check_source_city():
-    if 'id' in request.args:
-        id=request.args['id']
-        abc = connection.connection_manager()
-        sql = """SELECT * FROM cities WHERE cityid = ?"""
-        abc.execute("SELECT sourcecityid,sourcecityname FROM cities WHERE sourcecityid = %s",[id])
-        results = abc.fetchall()
-        print(results)
-        for res in results:
-            cityname = res[1]
-            cityid = res[0]
-        return cityname+","+cityid
-    else:
-        print("Error")
 
 @app.route("/getallcities",methods=['GET'])
 def getallcities():
@@ -153,14 +139,7 @@ def getallcities():
     device = 'web'
     if 'device' in request.args:
         device = request.args['device']
-    connection = psycopg2.connect(
-        database="postgres",
-        user="postgres",
-        password="postgres",
-        host="cloud-database.c4tjyvon2isw.us-east-1.rds.amazonaws.com",
-        port='5432'
-    )
-    schd = connection.cursor()
+    schd = connection.connection_manager()
     sql = """SELECT * FROM cities WHERE cityid = ?"""
     schd.execute("SELECT sourcecityid,sourcecityname FROM cities")
     results = schd.fetchall()
@@ -203,9 +182,6 @@ def check_destination():
         print("Error")
     return render_template('index.html')
 
-@app.route("/destination")
-def destination_search():
-	return render_template('index.html')
 
 @app.route("/book/ticket",methods=['POST','GET'])
 def book_ticket():
@@ -260,9 +236,65 @@ def payment():
         message = 'Please Login in to Continue with your Booking'
         return render_template('login.html',message=message)
 
-@app.route("/get/report")
+@app.route("/get/report", methods=['POST','GET'])
 def get_report():
-	return render_template('index.html')
+    if session.get('token_id'):
+        token_id = session['token_id']
+    device = 'web'
+    if 'depdate' in request.form:
+        dep_date = request.form['depdate']
+    else:
+        dep_date = date.today()
+   #dep_date = request.form.get('depdate') # Fetching the date from the admin
+    if dep_date != None:
+        #busesdet_query = "select s.scheduleid, ct.sourcecityname, s.destid, d.destname, s.busid, s.journeydate, s.starttime, s.seatsavailable, s.price from schedule s, destination d, cities ct where s.destid=d.destid and s.sourcecityid=ct.sourcecityid and journeydate = '{}'".format(str(dep_date))
+        travellers_query = "SELECT s.journeydate, d.destid, SUM(tk.seatsbooked) FROM schedule s, destination d, tickets tk WHERE s.scheduleid = tk.scheduleid AND s.destid=d.destid and s.journeydate = '{}' GROUP BY s.journeydate, d.destid".format(str(dep_date))
+        
+        # Establishing connection
+        report_data = connection.connection_manager()
+
+        # Extracting buses data
+        #report_data.execute(busesdet_query)
+        report_data.execute(
+            "select s.scheduleid, ct.sourcecityname, s.destid, d.destname, s.busid, s.journeydate, s.starttime, s.seatsavailable, s.price from schedule s, destination d, cities ct where s.destid=d.destid and s.sourcecityid=ct.sourcecityid and journeydate = %s;",
+            [dep_date])
+        bus_res = report_data.fetchall()
+        print(bus_res)
+        all_bus_list = []
+
+        for res in bus_res:
+            bus_list = []
+            bus_list.append(str(res[0]))
+            bus_list.append(str(res[1]))
+            bus_list.append(str(res[2]))
+            bus_list.append(str(res[3]))
+            bus_list.append(str(res[4]))
+            bus_list.append(str(res[5]))
+            bus_list.append(str(res[6]))
+            bus_list.append(str(res[7]))
+            bus_list.append(str(res[8]))
+
+            all_bus_list.append(bus_list)
+
+        # Extracting travellers data
+        report_data.execute(travellers_query)
+        trav_res = report_data.fetchall()
+        
+        all_trav_list = []
+
+        for res in trav_res:
+            trav_list = []
+            trav_list.append(str(res[0]))
+            trav_list.append(str(res[1]))
+            trav_list.append(str(res[2]))
+            print("JourneyDate: " + str(res[0]))
+            print("Destination ID: " + str(res[1]))
+            print("No. of travellers: " + str(res[2]))
+
+            all_trav_list.append(trav_list)
+        return render_template('report.html', all_bus_list=all_bus_list, all_trav_list=all_trav_list, dep_date=dep_date)
+    else:
+        return render_template('report.html')
 
 @app.route("/puts3")
 def put_file_to_s3():
@@ -287,6 +319,8 @@ def get_schedule():
     device = 'web'
     if 'device' in request.args:
         device = request.args['device']
+    if 'source' in request.form:
+        session['search_body'] = ''
     if session.get('search_body'):
         print(session['search_body'])
         sourcecityid = session['search_body']['sourcecityid']
@@ -298,6 +332,7 @@ def get_schedule():
         destination_id = request.form['destination']
         number_of_args = request.form['passengers']
         journey_date = request.form['datepicker']
+        #return_date = request.form['date2']
         session_dict = {}
         session_dict['sourcecityid'] = sourcecityid
         session_dict['destination_id'] = destination_id
@@ -307,7 +342,7 @@ def get_schedule():
         session['search_body'] = session_dict
     print(sourcecityid,destination_id,number_of_args,journey_date)
     data = {'source': sourcecityid, 'destination': destination_id,'passengers':number_of_args,'datepicker':journey_date}
-    response = requests.post("http://search3:5001/bus/search", data=data)
+    response = requests.post("http://127.0.0.1:5001/bus/search", json=data)
     bus_list = response.json()['buslists']
     if device != 'mobile':
         return render_template('buses.html',bus_list=bus_list,user=user)

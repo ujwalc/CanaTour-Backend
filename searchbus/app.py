@@ -19,18 +19,23 @@ app.secret_key = "cloud assignment"
 def get_schedule():
     print("into get bus search")
     schd = connection.connection_manager()
-    sourcecityid = request.form['source']
-    destination_id = request.form['destination']
-    number_of_args = request.form['passengers']
-    journey_date = request.form['datepicker']
+    req = request.get_json()
+    sourcecityid = req['source']
+    destination_id = req['destination']
+    number_of_args = req['passengers']
+    journey_date = req['datepicker']
+    #sourcecityid = request.form['source']
+    #destination_id = request.form['destination']
+    #number_of_args = request.form['passengers']
+    #journey_date = request.form['datepicker']
    # session['number_of_travllers'] = number_of_args
    # session['journey_date'] = journey_date
     print(sourcecityid,destination_id,number_of_args,journey_date)
     bus_list = []
-    if ('destination' in request.form and 'source' in request.form and 'datepicker' in request.form and 'passengers' in request.form) or session.get('search_body'):
+    if 'destination' in request.get_json() and 'source' in request.get_json() and 'datepicker' in request.get_json() and 'passengers' in request.get_json():
         schd.execute(
-            "SELECT s.sourcecityid, s.destid, d.destname, d.destprov, s.journeydate, s.starttime, s.seatsavailable, s.busid, s.scheduleid,s.price FROM schedule s JOIN cities cl ON s.sourcecityid = cl.sourcecityid JOIN destination d ON d.destid = s.destid WHERE s.sourcecityid = %s AND s.destid = %s AND journeydate = %s;",
-            [sourcecityid, destination_id,journey_date])
+            "SELECT s.sourcecityid, s.destid, d.destname, d.destprov, s.journeydate, s.starttime, s.seatsavailable, s.busid, s.scheduleid,s.price FROM schedule s JOIN cities cl ON s.sourcecityid = cl.sourcecityid JOIN destination d ON d.destid = s.destid WHERE s.sourcecityid = %s AND s.destid = %s AND journeydate = %s AND seatsavailable >= %s AND active_status = 'True';",
+            [sourcecityid, destination_id,journey_date,number_of_args])
         results = schd.fetchall()
         print(results)
         bus_list = []
