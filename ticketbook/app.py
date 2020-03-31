@@ -28,6 +28,53 @@ def home():
         user = session['token_id']
     return render_template('home.html',user=user)
 
+@app.route("/get/bookinghistory", methods=['GET'])
+def get_booking_history():
+    connection = psycopg2.connect(
+            database="postgres",
+            user="postgres",
+            password="postgres",
+            host="postgres.cviulopflptv.us-east-1.rds.amazonaws.com",
+            port='5432'
+    )
+
+    b_history = connection.cursor()
+    new_dict = {}
+    emailid = request.args['user']
+    print(emailid)
+    userdet_query = "select ud.firstname, ud.lastname from userdetails ud, tickets tk where ud.emailid=tk.emailid and tk.emailid='{}'".format(str(emailid))
+    if emailid != '':
+        b_history.execute(userdet_query)
+        user_det = b_history.fetchall()
+        for res in user_det:
+            firstname = res[0]
+            lastname = res[1]
+        book_history_query = "select  tk.ticketid, ct.sourcecityname, d.destname, d.destprov, s.journeydate, s.starttime, tk.seatsbooked, tk.payment, ud.firstname, ud.lastname from tickets tk, schedule s, cities ct, destination d, userdetails ud where tk.emailid=ud.emailid and tk.scheduleid=s.scheduleid and tk.destid=d.destid and s.sourcecityid=ct.sourcecityid and tk.emailid='{}' order by s.journeydate desc".format(str(emailid))
+        b_history.execute(book_history_query)
+        book_history_res = b_history.fetchall()
+        all_book_history = []
+        for res in book_history_res:
+            bk_hist_list = []
+            bk_hist_list.append(str(res[0]))
+            bk_hist_list.append(str(res[1]))
+            bk_hist_list.append(str(res[2]))
+            bk_hist_list.append(str(res[3]))
+            bk_hist_list.append(str(res[4]))
+            bk_hist_list.append(str(res[5]))
+            bk_hist_list.append(str(res[6]))
+            bk_hist_list.append(str(res[7]))
+            bk_hist_list.append(str(res[8]))
+            bk_hist_list.append(str(res[9]))
+            all_book_history.append(bk_hist_list)
+        new_dict['emailid'] = emailid
+        new_dict['firstname'] = firstname
+        new_dict['lastname'] = lastname
+        new_dict['all_book_history']=all_book_history
+        return new_dict
+    else:
+        return new_dict
+
+
 
 @app.route("/book/ticket",methods=['POST','GET'])
 def book_ticket():
@@ -75,7 +122,7 @@ def book_ticket():
                 print("Bus start time: " + str(starttime))
                 print("Bus id: " + str(busid))
                 schd.execute(
-                        "INSERT INTO tickets (username,destid,seatsbooked,active_status,scheduleid,payment) VALUES (%s,%s,%s,%s,%s,%s);",
+                        "INSERT INTO tickets (emailid,destid,seatsbooked,active_status,scheduleid,payment) VALUES (%s,%s,%s,%s,%s,%s);",
                         [username,destination_id,int(number_of_travellers),active_status,int(scheduleid),bus_dict['price']])
                 connection.commit()
                 pdfName = username+str(1)
@@ -109,10 +156,6 @@ def book_ticket():
                 pdf.drawString(50, 100, contactUs)
 
                 pdf.save()
-
-                import smtplib
-                from email.message import EmailMessage
-
                 pdf_name = pdfName
                 msg = EmailMessage()
                 from_ = "canatour.mail@gmail.com"

@@ -43,6 +43,11 @@
     })
 </script>
 
+      <script>
+function myFunction() {
+  document.getElementById("park2").style.display = "block";
+}
+</script>
 
 {%block head %} {% endblock %}
 	</head>
@@ -71,10 +76,11 @@
         {% else %}
 		<div class="dropdown">
 		  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-			{{user}}
+			 <span class="glyphicon glyphicon-user" aria-hidden="true"></span>
+       {{user}}
 		  </button>
 		  <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-			<a class="dropdown-item" href="#">Booking History</a>
+			<a class="dropdown-item" href="{{url_for('booking_history')}}">Booking History</a>
 			<a class="dropdown-item" href="{{url_for('signout')}}">Signout</a>
 		  </div>
 		</div>

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block body %}
+
+<h3>Ticket Booking History</h3>
+
+<h4 style="color:goldenrod"> User Name: {{firstname}} {{lastname}}</h4>
+<h4 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:chocolate">User Email ID: {{emailid}}</h4>
+
+
+
+    {% for ticket in all_book_history %}
+<div class="card">
+  <div class="card-body">
+    <br>
+    <p>Ticket ID: {{ticket[0]}}</p>
+    <p>{{ticket[1]}} to {{ticket[2]}}, {{ticket[3]}}</p>
+    <p>On {{ticket[4]}}, at {{ticket[5]}}</p>
+    <p>Seats Booked: {{ticket[6]}} | Amount paid: ${{ticket[7]}}</p> 
+</div>
+</div>
+
+
+<br>
+
+
+<!-- Labels: 
+
+Ticket ID: {{ticket[0]}}
+Source City: {{ticket[1]}}
+Destination Name: {{ticket[2]}}
+Destination Province: {{ticket[3]}}
+Date of Journey: {{ticket[4]}}
+Start Time: {{ticket[5]}}
+Seats Booked: {{ticket[6]}}
+Amount paid: {{ticket[7]}} -->
+{% endfor %}
+
+{% endblock %}

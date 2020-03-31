@@ -350,21 +350,13 @@ def get_schedule():
         return json.dumps({"buslists": bus_list})
 
 
-@app.route("/checkcognito")
-def lambda_handler():
-    username = "vidip"
-    email = "vidipmalhotra@gmail.com"
-    password = "h123hello"
-    name = "vidip"
-    client = boto3.client('cognito-idp')
-    response = client.list_users(
-    UserPoolId=USER_POOL_ID,
-    AttributesToGet=[
-        'email',
-    ],
-    Limit=123
-)
-    return render_template('index.html')
+@app.route("/get/bookinghistory")
+def booking_history():
+    if session.get('token_id'):
+        email = session['token_id']
+    response = requests.get('http://127.0.0.1:5002/get/bookinghistory?user='+email)
+    res = response.json()
+    return render_template('bookings.html',emailid=res['emailid'], firstname=res['firstname'], lastname=res['lastname'], all_book_history=res['all_book_history'],user=email)
 
 if __name__ == "__main__":
 	app.run(debug=True,host="0.0.0.0",port=5000)
