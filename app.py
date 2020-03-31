@@ -84,9 +84,10 @@ def getallcities():
         database="postgres",
         user="postgres",
         password="postgres",
-        host="ostgres.cviulopflptv.us-east-1.rds.amazonaws.com",
+        host="postgres.cviulopflptv.us-east-1.rds.amazonaws.com",
         port='5432'
     )
+    print("Entered 1")
     schd = connection.cursor()
     sql = """SELECT * FROM cities WHERE cityid = ?"""
     schd.execute("SELECT sourcecityid,sourcecityname FROM cities")
@@ -241,6 +242,47 @@ def payment():
     print(price)
     return render_template('payment.html',price=price)
 
+@app.route("/get/bookinghistory", methods=['POST','GET'])
+def get_booking_history():
+    
+    """ Session connection is not perfomred."""
+    
+    connection = psycopg2.connect(
+            database="postgres",
+            user="postgres",
+            password="postgres",
+            host="postgres.cviulopflptv.us-east-1.rds.amazonaws.com",
+            port='5432'
+    )
+
+    b_history = connection.cursor()
+    emailid = request.form['user'] # requires session connection.
+    # emailid = 'vidipmalhotra212@gmail.com'
+
+    if emailid != '':
+        book_history_query = "select  tk.ticketid, ct.sourcecityname, d.destname, d.destprov, s.journeydate, s.starttime, tk.seatsbooked, tk.payment from tickets tk, schedule s, cities ct, destination d where tk.scheduleid=s.scheduleid and tk.destid=d.destid and s.sourcecityid=ct.sourcecityid and tk.emailid='{}' order by s.journeydate desc".format(str(emailid))
+        b_history.execute(book_history_query)
+
+        book_history_res = b_history.fetchall()
+        all_book_history = []
+        for res in book_history_res:
+            bk_hist_list = []
+            bk_hist_list.append(str(res[0]))
+            bk_hist_list.append(str(res[1]))
+            bk_hist_list.append(str(res[2]))
+            bk_hist_list.append(str(res[3]))
+            bk_hist_list.append(str(res[4]))
+            bk_hist_list.append(str(res[5]))
+            bk_hist_list.append(str(res[6]))
+            bk_hist_list.append(str(res[7]))
+
+            all_book_history.append(bk_hist_list)
+
+        return render_template('booking_history.html', emailid=emailid, all_book_history=all_book_history)
+    else:
+        return "No user logged in."
+
+
 @app.route("/get/report", methods=['POST','GET'])
 def get_report():
 
@@ -256,19 +298,7 @@ def get_report():
 	#datetime.today().strftime('%Y-%m-%d')
 	dep_date = request.form.get('depdate') # Fetching the date from the admin
 	
-    """
-    We can implement this other logic here, but I'm somehow unable to do it because of some indent error.
-    I tried to debug it a lot but it just doesn't go. So, if you can, implement this below logic.
-
-    This logic defaults the dep_date to current date and shows the buses and travellers of the current date when we load the report page
-    and when the admin changes the date, it'll show the info related to that particular date. This is logically the correct way to do it.
-
-    if dep_date==None:
-        dep_date = datetime.today().strftime('%Y-%m-%d')
-    
-    busesdet_query = ....
-
-    """
+   
 	if dep_date != None:
 
 		# Queries to fetch bus related data and travelers data

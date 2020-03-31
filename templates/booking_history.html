@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Booking History</title>
+<style>
+
+div {border-style: inset;}
+h1 {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:black}
+h2 {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:darkgreen}
+h3 {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color:green}
+h4 {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: gray}
+
+
+</style>
+</head>
+
+<body>
+<br></br>
+<h1>Ticket Booking History</h3>
+<br>
+<h3 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: blue">User Email ID: {{emailid}}</h3>
+<br>
+{% for ticket in all_book_history %}
+<div>
+    <br>
+    <h4>Ticket ID: {{ticket[0]}}</h4>
+    <h2>{{ticket[1]}} to {{ticket[2]}}, {{ticket[3]}}</h2>
+    <h3>At {{ticket[5]}}, {{ticket[4]}}</h3>
+    <h4>Seats Booked: {{ticket[6]}} | Amount paid: ${{ticket[7]}}</h4> 
+</div>
+
+<!-- Labels: 
+
+Ticket ID: {{ticket[0]}}
+Source City: {{ticket[1]}}
+Destination Name: {{ticket[2]}}
+Destination Province: {{ticket[3]}}
+Date of Journey: {{ticket[4]}}
+Start Time: {{ticket[5]}}
+Seats Booked: {{ticket[6]}}
+Amount paid: {{ticket[7]}} -->
+{% endfor %}
+
+
+
+</body>
+</html>
