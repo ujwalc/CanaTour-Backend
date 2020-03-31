@@ -19,17 +19,18 @@ h4 {font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 </head>
 
 <body>
-<br></br>
 <h1>Ticket Booking History</h3>
 <br>
-<h3 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: blue">User Email ID: {{emailid}}</h3>
+<h2 style="color:goldenrod"> User Name: {{firstname}} {{lastname}}</h2>
+<h3 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:chocolate">User Email ID: {{emailid}}</h3>
+
 <br>
 {% for ticket in all_book_history %}
 <div>
     <br>
     <h4>Ticket ID: {{ticket[0]}}</h4>
     <h2>{{ticket[1]}} to {{ticket[2]}}, {{ticket[3]}}</h2>
-    <h3>At {{ticket[5]}}, {{ticket[4]}}</h3>
+    <h3>On {{ticket[4]}}, at {{ticket[5]}}</h3>
     <h4>Seats Booked: {{ticket[6]}} | Amount paid: ${{ticket[7]}}</h4> 
 </div>
 

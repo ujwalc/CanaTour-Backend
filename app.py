@@ -257,10 +257,18 @@ def get_booking_history():
 
     b_history = connection.cursor()
     emailid = request.form['user'] # requires session connection.
-    # emailid = 'vidipmalhotra212@gmail.com'
+    #emailid = 'vidipmalhotra212@gmail.com'
+    userdet_query = "select ud.firstname, ud.lastname from userdetails ud, tickets tk where ud.emailid=tk.emailid and tk.emailid='{}'".format(str(emailid))
 
     if emailid != '':
-        book_history_query = "select  tk.ticketid, ct.sourcecityname, d.destname, d.destprov, s.journeydate, s.starttime, tk.seatsbooked, tk.payment from tickets tk, schedule s, cities ct, destination d where tk.scheduleid=s.scheduleid and tk.destid=d.destid and s.sourcecityid=ct.sourcecityid and tk.emailid='{}' order by s.journeydate desc".format(str(emailid))
+        b_history.execute(userdet_query)
+        user_det = b_history.fetchall()
+
+        for res in user_det:
+            firstname = res[0]
+            lastname = res[1]
+
+        book_history_query = "select  tk.ticketid, ct.sourcecityname, d.destname, d.destprov, s.journeydate, s.starttime, tk.seatsbooked, tk.payment, ud.firstname, ud.lastname from tickets tk, schedule s, cities ct, destination d, userdetails ud where tk.emailid=ud.emailid and tk.scheduleid=s.scheduleid and tk.destid=d.destid and s.sourcecityid=ct.sourcecityid and tk.emailid='{}' order by s.journeydate desc".format(str(emailid))
         b_history.execute(book_history_query)
 
         book_history_res = b_history.fetchall()
@@ -275,10 +283,12 @@ def get_booking_history():
             bk_hist_list.append(str(res[5]))
             bk_hist_list.append(str(res[6]))
             bk_hist_list.append(str(res[7]))
+            bk_hist_list.append(str(res[8]))
+            bk_hist_list.append(str(res[9]))
 
             all_book_history.append(bk_hist_list)
 
-        return render_template('booking_history.html', emailid=emailid, all_book_history=all_book_history)
+        return render_template('booking_history.html', emailid=emailid, firstname=firstname, lastname=lastname, all_book_history=all_book_history)
     else:
         return "No user logged in."
 
