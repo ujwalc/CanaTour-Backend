@@ -54,10 +54,13 @@ def signin():
         device = request.args['device']
     email = request.form['email']
     password = request.form['password']
-    response = requests.get("http://127.0.0.1:3000/login/"+email+"/"+password)
+    response = requests.get("https://jipwvf53h4.execute-api.us-east-1.amazonaws.com/v2/login"+email+"/"+password)
     print(response)
     result = response.json()
     print(result)
+    if 'message' in result:
+        if result['message'] == 'Incorrect username or password.':
+            return render_template('login.html', message ='Incorrect username or password.')
     if result != '':
         session['token_id'] = email
     if result != '':
@@ -83,12 +86,15 @@ def user_signup():
     password = request.form['password']
     confirmpassword=request.form['confirmpassword']
     phonenumber=request.form['phonenumber']
+    session['user_temp_name'] = name
+    session['email_temp'] = email
+    session['phonenumber_temp'] = phonenumber
     device = 'web'
     if 'device' in request.args:
         device = request.args['device']
     data = {'email':email,'password':password,'name':name,'phone_number':phonenumber}
     print(data)
-    response = requests.post("http://127.0.0.1:3000/signup", json=data)
+    response = requests.post("https://jipwvf53h4.execute-api.us-east-1.amazonaws.com/v2/signup", json=data)
     print(response.json())
     session['email'] = response.json()
     if device != 'mobile':
@@ -111,10 +117,24 @@ def confirm_signup():
     if 'device' in request.args:
         device = request.args['device']
     data = {'email': user,'otp':otp}
-    response = requests.post("http://127.0.0.1:3000/confirmsignup", json=data)
+    response = requests.post("http://3.80.19.25:3000/confirmsignup", json=data)
     print(response.json())
     if device != 'mobile':
         if response.json() == 'SUCCESS':
+            connection = psycopg2.connect(
+            database="postgres",
+            user="postgres",
+            password="postgres",
+            host="postgres.cviulopflptv.us-east-1.rds.amazonaws.com",
+            port='5432'
+            )
+            schd = connection.cursor()
+            name = session['user_temp_name']
+            phone = session['phonenumber_temp']
+            schd.execute(
+                        "INSERT INTO userdetails (username,firstname,lastname,sex,emailid, phone, active_status,usertype) VALUES(%s,%s,%s,%s,%s,%s,%s,%s);",
+                        [name,name,name,'m/f',session['email'],phone,True,"user"])
+            connection.commit()
             session['token_id'] = user
             session['email'] = ''
             return render_template('home.html',user=user)
@@ -213,7 +233,7 @@ def book_ticket():
                 passengers = request.args['passengers']
         username = user
         data = {'cardNumber':cardNumber,'expiryMonth':expityMonth,'expiryYear':expiryYear,'cvCode':cvCode,'passengers':number_of_travellers,'scheduleid':scheduleid,'user':user}
-        response = requests.post("http://127.0.0.1:5002/book/ticket",data=data)
+        response = requests.post("https://jipwvf53h4.execute-api.us-east-1.amazonaws.com/v2/book-ticket",data=data)
         print(response)
         bus_dict = response.json()
         print(bus_dict)
@@ -245,16 +265,16 @@ def get_report():
         dep_date = request.form['depdate']
     else:
         dep_date = date.today()
-   #dep_date = request.form.get('depdate') # Fetching the date from the admin
     if dep_date != None:
         #busesdet_query = "select s.scheduleid, ct.sourcecityname, s.destid, d.destname, s.busid, s.journeydate, s.starttime, s.seatsavailable, s.price from schedule s, destination d, cities ct where s.destid=d.destid and s.sourcecityid=ct.sourcecityid and journeydate = '{}'".format(str(dep_date))
-        travellers_query = "SELECT s.journeydate, d.destid, SUM(tk.seatsbooked) FROM schedule s, destination d, tickets tk WHERE s.scheduleid = tk.scheduleid AND s.destid=d.destid and s.journeydate = '{}' GROUP BY s.journeydate, d.destid".format(str(dep_date))
-        
+        # UPDATE
+        travellers_query = "SELECT s.journeydate, d.destname, d.destprov, SUM(tk.seatsbooked) FROM schedule s, destination d, tickets tk WHERE s.scheduleid = tk.scheduleid AND s.destid=d.destid and s.journeydate = '{}' GROUP BY s.journeydate, d.destname, d.destprov".format(str(dep_date))
+        # UPDATE
+
         # Establishing connection
         report_data = connection.connection_manager()
 
         # Extracting buses data
-        #report_data.execute(busesdet_query)
         report_data.execute(
             "select s.scheduleid, ct.sourcecityname, s.destid, d.destname, s.busid, s.journeydate, s.starttime, s.seatsavailable, s.price from schedule s, destination d, cities ct where s.destid=d.destid and s.sourcecityid=ct.sourcecityid and journeydate = %s;",
             [dep_date])
@@ -282,16 +302,15 @@ def get_report():
         
         all_trav_list = []
 
+        # UPDATE 
         for res in trav_res:
             trav_list = []
             trav_list.append(str(res[0]))
             trav_list.append(str(res[1]))
             trav_list.append(str(res[2]))
-            print("JourneyDate: " + str(res[0]))
-            print("Destination ID: " + str(res[1]))
-            print("No. of travellers: " + str(res[2]))
-
+            trav_list.append(str(res[3]))
             all_trav_list.append(trav_list)
+        # UPDATE
         return render_template('report.html', all_bus_list=all_bus_list, all_trav_list=all_trav_list, dep_date=dep_date)
     else:
         return render_template('report.html')
@@ -342,7 +361,7 @@ def get_schedule():
         session['search_body'] = session_dict
     print(sourcecityid,destination_id,number_of_args,journey_date)
     data = {'source': sourcecityid, 'destination': destination_id,'passengers':number_of_args,'datepicker':journey_date}
-    response = requests.post("http://127.0.0.1:5001/bus/search", json=data)
+    response = requests.post("https://jipwvf53h4.execute-api.us-east-1.amazonaws.com/v2/bus-search", json=data)
     bus_list = response.json()['buslists']
     if device != 'mobile':
         return render_template('buses.html',bus_list=bus_list,user=user)
@@ -354,7 +373,7 @@ def get_schedule():
 def booking_history():
     if session.get('token_id'):
         email = session['token_id']
-    response = requests.get('http://127.0.0.1:5002/get/bookinghistory?user='+email)
+    response = requests.get('https://jipwvf53h4.execute-api.us-east-1.amazonaws.com/v2/booking-history?user='+email)
     res = response.json()
     return render_template('bookings.html',emailid=res['emailid'], firstname=res['firstname'], lastname=res['lastname'], all_book_history=res['all_book_history'],user=email)
 

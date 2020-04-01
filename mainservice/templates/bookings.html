@@ -2,27 +2,27 @@
 
 {% block body %}
 
+
+<div class="container">
+
 <h3>Ticket Booking History</h3>
 
 <h4 style="color:goldenrod"> User Name: {{firstname}} {{lastname}}</h4>
 <h4 style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color:chocolate">User Email ID: {{emailid}}</h4>
+<br>
+{% if all_book_history|length < 1 %}
+  <h4> <i> There is no booking history for this account. </i> </h4>
+{% endif %}
 
-
-
-    {% for ticket in all_book_history %}
+{% for ticket in all_book_history %}
 <div class="card">
   <div class="card-body">
-    <br>
-    <p>Ticket ID: {{ticket[0]}}</p>
-    <p>{{ticket[1]}} to {{ticket[2]}}, {{ticket[3]}}</p>
-    <p>On {{ticket[4]}}, at {{ticket[5]}}</p>
-    <p>Seats Booked: {{ticket[6]}} | Amount paid: ${{ticket[7]}}</p> 
+    <h4 class="card-title">Ticket ID: {{ticket[0]}}</h4>
+    <h6 class="card-text">{{ticket[1]}} to {{ticket[2]}}, {{ticket[3]}}</h6>
+    <h6 class="card-text">On {{ticket[4]}}, at {{ticket[5]}}</h6>
+    <h6 class="card-text">Seats Booked: {{ticket[6]}} | Amount paid: ${{ticket[7]}}</h6> 
 </div>
 </div>
-
-
-<br>
-
 
 <!-- Labels: 
 
@@ -35,5 +35,6 @@ Start Time: {{ticket[5]}}
 Seats Booked: {{ticket[6]}}
 Amount paid: {{ticket[7]}} -->
 {% endfor %}
+</div>
 
 {% endblock %}

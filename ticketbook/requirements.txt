@@ -2,3 +2,5 @@ Flask==1.1.1
 requests
 boto3
 psycopg2-binary
+reportlab
+

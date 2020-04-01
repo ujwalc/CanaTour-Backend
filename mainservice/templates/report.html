@@ -1,66 +1,75 @@
 {% extends 'base.html' %}
 
 {% block body %}
+
+<div class="container">
+
 <form action="{{ url_for('get_report')}}" method="POST">
-    <label for="datepicker"> Departure Date: </label>
+    <label for="datepicker"> Select Date: </label>
     <input type="date" id="depdate" name="depdate">
     <input type="submit" value="Submit">
 </form>
-<br></br>
-<br>
-<h3>Date: {{dep_date}}</h3>
 <br>
 
-<h3>Buses related data</h3>
-<br>
-<table border=1>
-    <thead>
-        <tr>
-            <td>Schedule ID</td>
-            <td>Source City</td>
-            <td>Destination ID</td>
-            <td>Destination Name</td>
-            <td>Bus ID</td>
-            <td>Journey Date</td>
-            <td>Start Time</td>
-            <td>Available Seats</td>
-            <td>Price per seat</td>
-        </tr>
-    </thead>
-    {% for bus in all_bus_list %}
-        <tr>
-            <td>{{bus[0]}}</td>
-            <td>{{bus[1]}}</td>
-            <td>{{bus[2]}}</td>
-            <td>{{bus[3]}}</td>
-            <td>{{bus[4]}}</td>
-            <td>{{bus[5]}}</td>
-            <td>{{bus[6]}}</td>
-            <td>{{bus[7]}}</td>
-            <td>{{bus[8]}}</td>
-        </tr>
-    {% endfor %}
-</table>
+<h4>Date: {{dep_date}}</h4>
 
-<br>
+<h4> <i> Buses related data </i> </h4>
+<p> The following table shows a list of all the Canatour's buses available on the selected date. </p>
+<div style="height: 180px; overflow: auto;">
+    <table class="table table-bordered table-sm table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Schedule ID</th>
+                <th>Source City</th>
+                <th>Destination ID</th>
+                <th>Destination Name</th>
+                <th>Bus ID</th>
+                <th>Journey Date</th>
+                <th>Start Time</th>
+                <th>Available Seats</th>
+                <th>Price per seat</th>
+            </tr>
+        </thead>
+        {% for bus in all_bus_list %}
+            <tr>
+                <td>{{bus[0]}}</td>
+                <td>{{bus[1]}}</td>
+                <td>{{bus[2]}}</td>
+                <td>{{bus[3]}}</td>
+                <td>{{bus[4]}}</td>
+                <td>{{bus[5]}}</td>
+                <td>{{bus[6]}}</td>
+                <td>{{bus[7]}}</td>
+                <td>{{bus[8]}}</td>
+            </tr>
+        {% endfor %}
+    </table>    
+</div>
 <br>
 
-<h3>Travellers related data</h3>
-<br>
-<table border=1>
-    <thead>
-        <tr>
-            <td>Journey Date</td>
-            <td>Destination ID</td>
-            <td>No. of travellers</td>
-        </tr>
-    </thead>
-    {% for trav in all_trav_list %}
-        <tr>
-            <td>{{trav[0]}}</td>
-            <td>{{trav[1]}}</td>
-            <td>{{trav[2]}}</td>
-        </tr>
-    {% endfor %}
-</table>
+<h4> <i> Travellers related data </i> </h4>
+<p> The following table displays the number of travellers traveling to a particular destination on the selected date.
+    This can be useful to decide whether or not to travel to the particular destination and/or to find the trending travel destination. </p>
+<div style="height: 180px; overflow: auto;">
+    <table class="table table-bordered table-sm table-striped">
+        <thead class="thead-dark">
+            <tr>
+                <th>Journey Date</th>
+                <th>Destination Name</th>
+                <th>Province</th>
+                <th>No. of travellers</th>
+            </tr>
+        </thead>
+        {% for trav in all_trav_list %}
+            <tr>
+                <td>{{trav[0]}}</td>
+                <td>{{trav[1]}}</td>
+                <td>{{trav[2]}}</td>
+                <td>{{trav[3]}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+</div>
+
 {% endblock %}

@@ -113,6 +113,8 @@ const userPool = new AmazonCognitoIdentity.CognitoUserPool(poolData);
         },
         onFailure: function(err) {
             console.log(err);
+            token_id = err
+            callback(token_id)
         },
 
     });

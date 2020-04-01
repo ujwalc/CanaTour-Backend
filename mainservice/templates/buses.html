@@ -9,27 +9,31 @@
 </style>
 
     <div class="container">
-        <h2> Available Buses </h2>
-        <!-- <p>Image at the top (card-img-top):</p> -->
-        {{message}}
-        {% for i in bus_list %}
-        <div class="card" style="width:600px">
-            <div class="aParent">
-                <div>
-                <img src="{{url_for('static', filename='busphoto.jpg')}}" alt="" width="200" height="150">
-                </div>
-                <div class="card-body">
-                    <h6 class="card-title">From: {{i['source_city_name']}}</h4>
-                    <h6 class="card-title">To: {{i['destination_name']}} </h4>
-                        <h5 class="card-title">Price: $ {{i['price']}} </h5>
-                    <p class="card-text"> Departure Time: {{i['starttime']}}</p>
-                    <p class="card-text"> Seats Available: {{i['seatsavailable']}}</p>
-                    <p class="card-text"> Destination Province: {{i['destprov']}}</p>
-                    <a href="{{url_for('payment',price=i['price'],id=i['scheduleid'])}}" class="btn btn-primary"> Book Tickets </a>
+        {% if bus_list|length > 0 %}
+            <h2> Available Buses </h2>
+            <!-- <p>Image at the top (card-img-top):</p> -->
+            {{message}}
+            {% for i in bus_list %}
+            <div class="card" style="width:600px">
+                <div class="aParent">
+                    <div>
+                    <img src="https://canatours3bucket.s3.amazonaws.com/images/busphoto.jpg" alt="" width="200" height="150">
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-title">From: {{i['source_city_name']}}</h4>
+                        <h6 class="card-title">To: {{i['destination_name']}} </h4>
+                            <h5 class="card-title">Price: $ {{i['price']}} </h5>
+                        <p class="card-text"> Departure Time: {{i['starttime']}}</p>
+                        <p class="card-text"> Seats Available: {{i['seatsavailable']}}</p>
+                        <p class="card-text"> Destination Province: {{i['destprov']}}</p>
+                        <a href="{{url_for('payment',price=i['price'],id=i['scheduleid'])}}" class="btn btn-primary"> Book Tickets </a>
+                    </div>
                 </div>
             </div>
-        </div>
-        {% endfor %}
+            {% endfor %}
+        {% else %}
+            <h2> There are no available buses for the selected criteria. </h2>
+        {% endif %}        
     </div>
 
 {% endblock %}

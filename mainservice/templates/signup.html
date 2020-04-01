@@ -20,32 +20,26 @@
                     <br>
                     <div class="form-group">
                         <label for="username"> Name </label>
-                        <input type="text" class="form-control" id="username"  name="username" placeholder="Enter Name">
+                        <input type="text" class="form-control" id="username"  name="username" placeholder="Enter Name" required>
                     </div>  
                     <div class="form-group">
                         <label for="email">Email address</label>
-                        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email">
+                        <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" placeholder="Enter email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$">
                     </div>
                     <div class="form-group">
                         <label for="password">Password</label>
-                        <input type="password" class="form-control" id="password" name="password" placeholder="Password">
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Password" required>
+                        <small> Minimum of 8 characters. At least one capital letter [A-Z], one special character, and one number [0-9]. </small>
                     </div>
                     <div class="form-group">
                         <label for="confirmpassword">Confirm Password</label>
-                        <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" placeholder="Repeat Password">
+                        <input type="password" class="form-control" id="confirmpassword" name="confirmpassword" placeholder="Repeat Password" required>
                     </div>
 
                      <div class="form-group">
                         <label for="phonenumber">Phone Number</label>
-                        <input type="text" class="form-control" id="phonenumber" name="phonenumber" placeholder="Phone Number">
+                        <input type="text" class="form-control" id="phonenumber" name="phonenumber" placeholder="Phone Number" required>
                     </div>
-                 <!--   <div class="form-group">
-                        <label for="radioInput"> Gender </label>
-                        <br>
-                        <input type="radio" name="radio" id="radioInput" value="male"> Male 
-                        &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-                        <input type="radio" name="radio" id="radioInput" value="female"> Female                        
-                    </div> -->
                     <br>
                     <button type="submit" class="btn btn-primary btn-block"> Sign up </button>
                 </form>            

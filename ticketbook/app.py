@@ -13,6 +13,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib import colors
 import smtplib
 from email.message import EmailMessage
+import time
 
 
 app = Flask(__name__)
@@ -42,7 +43,7 @@ def get_booking_history():
     new_dict = {}
     emailid = request.args['user']
     print(emailid)
-    userdet_query = "select ud.firstname, ud.lastname from userdetails ud, tickets tk where ud.emailid=tk.emailid and tk.emailid='{}'".format(str(emailid))
+    userdet_query = "select ud.firstname, ud.lastname from userdetails ud where ud.emailid='{}'".format(str(emailid))
     if emailid != '':
         b_history.execute(userdet_query)
         user_det = b_history.fetchall()
@@ -121,19 +122,41 @@ def book_ticket():
                 print("Destination Name: " + destination_id)
                 print("Bus start time: " + str(starttime))
                 print("Bus id: " + str(busid))
+                booking_time = int(time.time())
                 schd.execute(
-                        "INSERT INTO tickets (emailid,destid,seatsbooked,active_status,scheduleid,payment) VALUES (%s,%s,%s,%s,%s,%s);",
-                        [username,destination_id,int(number_of_travellers),active_status,int(scheduleid),bus_dict['price']])
+                        "INSERT INTO tickets (emailid,destid,seatsbooked,active_status,scheduleid,payment,booking_time) VALUES (%s,%s,%s,%s,%s,%s,%s);",
+                        [username,destination_id,int(number_of_travellers),active_status,int(scheduleid),bus_dict['price'],booking_time])
                 connection.commit()
-                pdfName = username+str(1)
-                pdfTitle = "Ticket Booking Success"
-                bookingReference = 'Booking Reference: ' + str(1)
-                name = 'Name: ' + username
-                source = 'From: ' + source_city_id
-                destination = 'To: ' + destination_id
-                departureDay = 'Departure Day: ' + str(journeydate)
-                departureTime = 'Departure Time: ' +str(starttime)
-                numberOfTravellers = 'Number Of Travellers: ' + str(number_of_travellers)
+                schd.execute(
+                        "UPDATE schedule SET seatsavailable = seatsavailable - %s WHERE scheduleid = %s",
+                        [int(number_of_travellers),int(scheduleid)])
+                connection.commit()
+                ticket_query = "select tk.ticketid, ud.firstname, ud.lastname, ud.emailid, ct.sourcecityname, d.destname, d.destprov, s.journeydate, s.starttime, tk.seatsbooked, tk.payment from userdetails ud, tickets tk, destination d, schedule s, cities ct where ud.emailid=tk.emailid and tk.destid=d.destid and tk.scheduleid=s.scheduleid and s.sourcecityid=ct.sourcecityid and tk.emailid='{}' order by booking_time desc Limit 1".format(username)
+
+                schd.execute(ticket_query)
+                ticket_results = schd.fetchall()
+
+                for res in ticket_results:
+                    pdf_ticketid = str(res[0])
+                    pdf_name = str(res[1])
+                    pdf_email = str(res[3])
+                    pdf_source = str(res[4])
+                    pdf_dest = str(res[5])+", "+str(res[6])
+                    pdf_departure_date = str(res[7])
+                    pdf_departure_time = str(res[8])
+                    pdf_seatsbooked = str(res[9])
+                    pdf_payment = "$"+str(res[10])
+                
+                pdfName = username.split('@')[0]+'_'+pdf_ticketid+'_ticket.pdf'
+                pdfTitle = "Hi "+pdf_name+"! Here's your ticket."
+                bookingReference = 'Ticket ID#: ' + pdf_ticketid
+                name = 'Email: ' + pdf_email
+                source = 'From: ' + pdf_source
+                destination = 'To: ' + pdf_dest
+                departureDay = 'Departure Day: ' + pdf_departure_date
+                departureTime = 'Departure Time: ' + pdf_departure_time
+                numberOfTravellers = 'Number Of Travellers: ' + pdf_seatsbooked
+                amount_paid = 'Amount paid: '+pdf_payment
                 contactUs = 'Customer Support: canatour.mail@gmail.com'
 
                 pdf = canvas.Canvas(pdfName)
@@ -144,6 +167,7 @@ def book_ticket():
                 pdf.line(170, 790, 400, 790)
 
                 pdf.setFont("Courier",14)
+                pdf.drawString(50, 740, pdfTitle)
                 pdf.drawString(50, 720, bookingReference)
                 pdf.drawString(50, 700, name)
                 pdf.drawString(50, 680, source)
@@ -151,7 +175,7 @@ def book_ticket():
                 pdf.drawString(50, 640, departureDay)
                 pdf.drawString(50, 620, departureTime)
                 pdf.drawString(50, 600, numberOfTravellers)
-
+                pdf.drawString(50, 580, amount_paid)
                 pdf.setFont("Courier-Bold",12)
                 pdf.drawString(50, 100, contactUs)
 
@@ -163,7 +187,7 @@ def book_ticket():
                 msg['Subject'] = "Booking Successful - Canatour" 
                 msg['From'] = from_
                 msg['To'] = username
-                msg.set_content('Please find attached your travel ticket. Hope you will enjoy the journey.')
+                msg.set_content('Please find attached your travel ticket. Hope you enjoy the journey.')
 
                 with open(pdf_name, 'rb') as f:
                     file_data = f.read()
