@@ -1,0 +1,20 @@
+version: '2'
+services:
+ ticketbook:
+  container_name: "ticketbook"
+  build: ticketbook
+  ports:
+   - "5002:5002"
+ searchbus:
+  container_name: "searchbus"
+  build: searchbus
+  ports:
+   - "5001:5001"
+ mainservie: 
+  container_name: "mainservice"
+  build: mainservice 
+  ports:
+   - "5000:5000"
+  links:
+   - "ticketbook"
+   - "searchbus"
